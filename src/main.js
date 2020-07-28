@@ -36,3 +36,13 @@ const createSiteMenuTemplate = () => {
     </section>`
   );
 };
+
+/**
+ * @description Выполняет вставку в DOM.
+ * @param {Object} container Контейнер для вставки.
+ * @param {String} template Разметка в виде строки.
+ * @param {String} place Положение в разметке.
+ */
+const render = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
