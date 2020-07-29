@@ -2,10 +2,6 @@
 
 const TASK_COUNT = 3;
 
-/**
- * @description Возвращающую разметку меню.
- * @return {String} Разметка меню.
- */
 const createSiteMenuTemplate = () => {
   return (
     `<section class="control__btn-wrap">
@@ -39,10 +35,6 @@ const createSiteMenuTemplate = () => {
   );
 };
 
-/**
- * @description Возвращающую разметку фильтра.
- * @return {String} Разметка фильтра.
- */
 const createFilterTemplate = () => {
   return (
     `<section class="main__filter filter container">
@@ -107,10 +99,6 @@ const createFilterTemplate = () => {
   );
 };
 
-/**
- * @description Возвращающую разметку доски.
- * @return {String} Разметка доски.
- */
 const createBoardTemplate = () => {
   return (
     `<section class="board container">
@@ -124,10 +112,6 @@ const createBoardTemplate = () => {
   );
 };
 
-/**
- * @description Возвращающую разметку задачи.
- * @return {String} Разметка задачи.
- */
 const createTaskTemplate = () => {
   return (
     `<article class="card card--black">
@@ -172,10 +156,6 @@ const createTaskTemplate = () => {
   );
 };
 
-/**
- * @description Возвращающую разметку редактирования задачи.
- * @return {String} Разметка редактирования задачи.
- */
 const createTaskEditTemplate = () => {
   return (
     `<article class="card card--edit card--yellow card--repeat">
@@ -371,22 +351,13 @@ const createTaskEditTemplate = () => {
   );
 };
 
-/**
- * @description Возвращающую разметку кнопки дозагрузки задач.
- * @return {String} Разметка кнопки дозагрузки задач.
- */
 const createLoadMoreButtonTemplate = () => {
   return (
     `<button class="load-more" type="button">load more</button>`
   );
 };
 
-/**
- * @description Выполняет вставку в DOM.
- * @param {Object} container Контейнер для вставки.
- * @param {String} template Разметка в виде строки.
- * @param {String} place Положение в разметке.
- */
+
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
