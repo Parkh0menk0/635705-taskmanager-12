@@ -10,6 +10,7 @@ import {generateFilter} from "./mock/filter.js";
 const TASK_COUNT = 4;
 
 const tasks = new Array(TASK_COUNT).fill().map(generateTask);
+const filters = generateFilter(tasks);
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
