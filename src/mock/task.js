@@ -54,10 +54,9 @@ const getRandomColor = () => {
   return colors[randomIndex];
 };
 
-const task = {
-  description: generateDescription(),
-  dueDate: generateDate(),
-  repeating: task.dueDate === null ?
+export const generateTask = () => {
+  const dueDate = generateDate();
+  const repeating = dueDate === null ?
     generateRepeating() : {
       mo: false,
       tu: false,
@@ -66,8 +65,14 @@ const task = {
       fr: false,
       sa: false,
       su: false
-    },
-  color: getRandomColor(),
-  isArchive: Boolean(getRandomInteger(0, 1)),
-  isFavorite: Boolean(getRandomInteger(0, 1))
+    };
+
+  return {
+    description: generateDescription(),
+    dueDate,
+    repeating,
+    color: getRandomColor(),
+    isArchive: Boolean(getRandomInteger(0, 1)),
+    isFavorite: Boolean(getRandomInteger(0, 1))
+  };
 };
