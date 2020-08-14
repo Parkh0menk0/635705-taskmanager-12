@@ -8,7 +8,7 @@ import SortView from "./view/sort.js";
 import TaskListView from "./view/task-list.js";
 import {generateTask} from "./mock/task.js";
 import {generateFilter} from "./mock/filter.js";
-import {renderTemplate, renderElement, RenderPosition} from "./utils.js";
+import {render, RenderPosition} from "./utils.js";
 
 const TASK_COUNT = 22;
 const TASK_COUNT_PER_STEP = 8;
@@ -19,34 +19,34 @@ const filters = generateFilter(tasks);
 const siteMainElement = document.querySelector(`.main`);
 const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
 
-renderElement(siteHeaderElement, new SiteMenuView().getElement());
-renderElement(siteMainElement, new FilterView(filters).getElement());
+render(siteHeaderElement, new SiteMenuView().getElement());
+render(siteMainElement, new FilterView(filters).getElement());
 
 const boardComponent = new BoardView();
 
-renderElement(siteMainElement, boardComponent.getElement());
-renderElement(boardComponent.getElement(), new SortView().getElement(), RenderPosition.AFTERBEGIN);
+render(siteMainElement, boardComponent.getElement());
+render(boardComponent.getElement(), new SortView().getElement(), RenderPosition.AFTERBEGIN);
 
 const taskListComponent = new TaskListView();
 
-renderElement(boardComponent.getElement(), taskListComponent.getElement());
-renderElement(taskListComponent.getElement(), new TaskEditView(tasks[0]).getElement());
+render(boardComponent.getElement(), taskListComponent.getElement());
+render(taskListComponent.getElement(), new TaskEditView(tasks[0]).getElement());
 
 for (let i = 1; i < Math.min(tasks.length, TASK_COUNT_PER_STEP); i++) {
-  renderElement(taskListComponent.getElement(), new TaskView(tasks[i]).getElement());
+  render(taskListComponent.getElement(), new TaskView(tasks[i]).getElement());
 }
 
 if (tasks.length > TASK_COUNT_PER_STEP) {
   let renderedTaskCount = TASK_COUNT_PER_STEP;
 
   const loadMoreButtonComponent = new LoadMoreButtonView();
-  renderElement(boardComponent.getElement(), loadMoreButtonComponent.getElement());
+  render(boardComponent.getElement(), loadMoreButtonComponent.getElement());
 
   loadMoreButtonComponent.getElement().addEventListener(`click`, (evt) => {
     evt.preventDefault();
     tasks
       .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
-      .forEach((task) => renderElement(taskListComponent.getElement(), new TaskView(task).getElement()));
+      .forEach((task) => render(taskListComponent.getElement(), new TaskView(task).getElement()));
 
     renderedTaskCount += TASK_COUNT_PER_STEP;
 
