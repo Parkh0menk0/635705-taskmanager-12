@@ -12,6 +12,8 @@ import {render, RenderPosition} from "./utils.js";
 
 const TASK_COUNT = 22;
 const TASK_COUNT_PER_STEP = 8;
+const ESC_KEY = `Escape`;
+
 
 const tasks = new Array(TASK_COUNT).fill().map(generateTask);
 const filters = generateFilter(tasks);
@@ -31,13 +33,23 @@ const renderTask = (taskListElement, task) => {
     taskListElement.replaceChild(taskComponent.getElement(), taskEditComponent.getElement());
   };
 
+  const onEscKeyDown = (evt) => {
+    if (evt.key === ESC_KEY || evt.key === ESC_KEY.slice(0, 3)) {
+      evt.preventDefault();
+      replaceFormToCard();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
   taskComponent.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, () => {
     replaceCardToForm();
+    document.addEventListener(`keydown`, onEscKeyDown);
   });
 
   taskEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceFormToCard();
+    document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
   render(taskListElement, taskComponent.getElement(), RenderPosition.BEFOREEND);
