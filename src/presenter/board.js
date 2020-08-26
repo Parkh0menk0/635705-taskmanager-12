@@ -12,19 +12,21 @@ const TASK_COUNT_PER_STEP = 8;
 export default class Board {
   constructor(boardContainer) {
     this._boardContainer = boardContainer;
+    this._renderedTaskCount = TASK_COUNT_PER_STEP;
 
     this._boardComponent = new BoardView();
     this._sortComponent = new SortView();
     this._taskListComponent = new TaskListView();
     this._noTaskComponent = new NoTaskView();
+    this._loadMoreButtonComponent = new LoadMoreButtonView();
+
+    this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
   }
 
   init(boardTasks) {
     this._boardTasks = boardTasks.slice();
-
     render(this._boardContainer, this._boardComponent);
     render(this._boardComponent, this._taskListComponent);
-
     this._renderBoard();
   }
 
@@ -33,18 +35,14 @@ export default class Board {
   }
 
   _renderTask(task) {
-
     const taskComponent = new TaskView(task);
     const taskEditComponent = new TaskEditView(task);
-
     const replaceCardToForm = () => {
       replace(taskEditComponent, taskComponent);
     };
-
     const replaceFormToCard = () => {
       replace(taskComponent, taskEditComponent);
     };
-
     const onEscKeyDown = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
         evt.preventDefault();
@@ -52,17 +50,14 @@ export default class Board {
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
-
     taskComponent.setEditClickHandler(() => {
       replaceCardToForm();
       document.addEventListener(`keydown`, onEscKeyDown);
     });
-
     taskEditComponent.setFormSubmitHandler(() => {
       replaceFormToCard();
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
-
     render(this._taskListComponent, taskComponent);
   }
 
@@ -76,29 +71,21 @@ export default class Board {
     render(this._boardComponent, this._noTaskComponent, RenderPosition.AFTERBEGIN);
   }
 
+  _handleLoadMoreButtonClick() {
+    this._renderTasks(this._renderedTaskCount, this._renderedTaskCount + TASK_COUNT_PER_STEP);
+    this._renderedTaskCount += TASK_COUNT_PER_STEP;
+    if (this._renderedTaskCount >= this._boardTasks.length) {
+      remove(this._loadMoreButtonComponent);
+    }
+  }
+
   _renderLoadMoreButton() {
-    let renderedTaskCount = TASK_COUNT_PER_STEP;
-
-    const loadMoreButtonComponent = new LoadMoreButtonView();
-
-    render(this._boardComponent, loadMoreButtonComponent);
-
-    loadMoreButtonComponent.setClickHandler(() => {
-      this._boardTasks
-        .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
-        .forEach((boardTask) => this._renderTask(boardTask));
-
-      renderedTaskCount += TASK_COUNT_PER_STEP;
-
-      if (renderedTaskCount >= this._boardTasks.length) {
-        remove(loadMoreButtonComponent);
-      }
-    });
+    render(this._boardComponent, this._loadMoreButtonComponent);
+    this._loadMoreButtonComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
   _renderTaskList() {
     this._renderTasks(0, Math.min(this._boardTasks.length, TASK_COUNT_PER_STEP));
-
     if (this._boardTasks.length > TASK_COUNT_PER_STEP) {
       this._renderLoadMoreButton();
     }
@@ -109,9 +96,8 @@ export default class Board {
       this._renderNoTasks();
       return;
     }
-
     this._renderSort();
-
     this._renderTaskList();
   }
+
 }
