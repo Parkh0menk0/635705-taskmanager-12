@@ -22,10 +22,10 @@ export default class Board {
   init(boardTasks) {
     this._boardTasks = boardTasks.slice();
 
-    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
-    render(this._boardComponent, this._taskListComponent, RenderPosition.BEFOREEND);
+    render(this._boardContainer, this._boardComponent);
+    render(this._boardComponent, this._taskListComponent);
 
-    this._renderBoard();s
+    this._renderBoard();
   }
 
   _renderSort() {
@@ -63,7 +63,7 @@ export default class Board {
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
-    render(this._taskListComponent, taskComponent, RenderPosition.BEFOREEND);
+    render(this._taskListComponent, taskComponent);
   }
 
   _renderTasks(from, to) {
@@ -81,7 +81,7 @@ export default class Board {
 
     const loadMoreButtonComponent = new LoadMoreButtonView();
 
-    render(this._boardComponent, loadMoreButtonComponent, RenderPosition.BEFOREEND);
+    render(this._boardComponent, loadMoreButtonComponent);
 
     loadMoreButtonComponent.setClickHandler(() => {
       this._boardTasks
