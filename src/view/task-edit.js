@@ -1,6 +1,6 @@
+import AbstractView from "./abstract.js";
 import {COLORS} from "../const.js";
 import {isTaskExpired, isTaskRepeating, humanizeTaskDueDate} from "../utils/task.js";
-import AbstractView from "./abstract.js";
 
 const BLANK_TASK = {
   color: COLORS[0],
@@ -30,7 +30,7 @@ const createTaskEditDateTemplate = (dueDate, isDueDate) => {
           type="text"
           placeholder=""
           name="date"
-          value="${humanizeTaskDueDate(dueDate)}"
+          value="${dueDate !== null ? humanizeTaskDueDate(dueDate) : ``}"
         />
       </label>
     </fieldset>` : ``}
@@ -76,72 +76,61 @@ const createTaskEditColorsTemplate = (currentColor) => {
 
 const createTaskEditTemplate = (data) => {
   const {color, description, dueDate, repeating, isDueDate, isRepeating} = data;
-
   const deadlineClassName = isTaskExpired(dueDate) ? `card--deadline` : ``;
-
   const dateTemplate = createTaskEditDateTemplate(dueDate, isDueDate);
-
   const repeatingClassName = isRepeating ? `card--repeat` : ``;
-
   const repeatingTemplate = createTaskEditRepeatingTemplate(repeating, isRepeating);
-
   const colorsTemplate = createTaskEditColorsTemplate(color);
 
   return `<article class="card card--edit card--${color} ${deadlineClassName} ${repeatingClassName}">
-      <form class="card__form" method="get">
-        <div class="card__inner">
-          <div class="card__color-bar">
-            <svg class="card__color-bar-wave" width="100%" height="10">
-              <use xlink:href="#wave"></use>
-            </svg>
-          </div>
-          <div class="card__textarea-wrap">
-            <label>
-              <textarea
-                class="card__text"
-                placeholder="Start typing your text here..."
-                name="text"
-              >${description}</textarea>
-            </label>
-          </div>
-          <div class="card__settings">
-            <div class="card__details">
-              <div class="card__dates">
-                ${dateTemplate}
-                ${repeatingTemplate}
-              </div>
-            </div>
-            <div class="card__colors-inner">
-              <h3 class="card__colors-title">Color</h3>
-              <div class="card__colors-wrap">
-                ${colorsTemplate}
-              </div>
+    <form class="card__form" method="get">
+      <div class="card__inner">
+        <div class="card__color-bar">
+          <svg class="card__color-bar-wave" width="100%" height="10">
+            <use xlink:href="#wave"></use>
+          </svg>
+        </div>
+        <div class="card__textarea-wrap">
+          <label>
+            <textarea
+              class="card__text"
+              placeholder="Start typing your text here..."
+              name="text"
+            >${description}</textarea>
+          </label>
+        </div>
+        <div class="card__settings">
+          <div class="card__details">
+            <div class="card__dates">
+              ${dateTemplate}
+              ${repeatingTemplate}
             </div>
           </div>
-          <div class="card__status-btns">
-            <button class="card__save" type="submit">save</button>
-            <button class="card__delete" type="button">delete</button>
+          <div class="card__colors-inner">
+            <h3 class="card__colors-title">Color</h3>
+            <div class="card__colors-wrap">
+              ${colorsTemplate}
+            </div>
           </div>
         </div>
-      </form>
-    </article>`;
+        <div class="card__status-btns">
+          <button class="card__save" type="submit">save</button>
+          <button class="card__delete" type="button">delete</button>
+        </div>
+      </div>
+    </form>
+  </article>`;
 };
 
 export default class TaskEdit extends AbstractView {
   constructor(task = BLANK_TASK) {
     super();
     this._data = TaskEdit.parseTaskToData(task);
-
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._dueDateToggleHandler = this._dueDateToggleHandler.bind(this);
     this._repeatingToggleHandler = this._repeatingToggleHandler.bind(this);
 
-    this.getElement()
-      .querySelector(`.card__date-deadline-toggle`)
-      .addEventListener(`click`, this._dueDateToggleHandler);
-    this.getElement()
-      .querySelector(`.card__repeat-toggle`)
-      .addEventListener(`click`, this._repeatingToggleHandler);
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -152,13 +141,7 @@ export default class TaskEdit extends AbstractView {
     if (!update) {
       return;
     }
-
-    this._data = Object.assign(
-        {},
-        this._data,
-        update
-    );
-
+    this._data = Object.assign({}, this._data, update);
     this.updateElement();
   }
 
@@ -166,11 +149,26 @@ export default class TaskEdit extends AbstractView {
     let prevElement = this.getElement();
     const parent = prevElement.parentElement;
     this.removeElement();
-
     const newElement = this.getElement();
 
     parent.replaceChild(newElement, prevElement);
     prevElement = null;
+
+    this.restoreHandlers();
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.card__date-deadline-toggle`)
+      .addEventListener(`click`, this._dueDateToggleHandler);
+    this.getElement()
+      .querySelector(`.card__repeat-toggle`)
+      .addEventListener(`click`, this._repeatingToggleHandler);
   }
 
   _dueDateToggleHandler(evt) {
@@ -198,23 +196,19 @@ export default class TaskEdit extends AbstractView {
   }
 
   static parseTaskToData(task) {
-    return Object.assign(
-        {},
-        task,
-        {
-          isDueDate: task.dueDate !== null,
-          isRepeating: isTaskRepeating(task.repeating)
-        }
+    return Object.assign({},
+      task, {
+        isDueDate: task.dueDate !== null,
+        isRepeating: isTaskRepeating(task.repeating)
+      }
     );
   }
 
   static parseDataToTask(data) {
     data = Object.assign({}, data);
-
     if (!data.isDueDate) {
       data.dueDate = null;
     }
-
     if (!data.isRepeating) {
       data.repeating = {
         mo: false,
@@ -226,11 +220,8 @@ export default class TaskEdit extends AbstractView {
         su: false
       };
     }
-
     delete data.isDueDate;
     delete data.isRepeating;
-
     return data;
   }
-
 }
