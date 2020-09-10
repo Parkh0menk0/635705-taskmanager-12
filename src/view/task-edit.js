@@ -161,15 +161,15 @@ export default class TaskEdit extends SmartView {
       .querySelector(`.card__text`)
       .addEventListener(`input`, this._descriptionInputHandler);
 
-      if (this._data.isRepeating) {
-        this.getElement()
-          .querySelector(`.card__repeat-days-inner`)
-          .addEventListener(`change`, this._repeatingChangeHandler);
-      }
-
+    if (this._data.isRepeating) {
       this.getElement()
-        .querySelector(`.card__colors-wrap`)
-        .addEventListener(`change`, this._colorChangeHandler);
+        .querySelector(`.card__repeat-days-inner`)
+        .addEventListener(`change`, this._repeatingChangeHandler);
+    }
+
+    this.getElement()
+      .querySelector(`.card__colors-wrap`)
+      .addEventListener(`change`, this._colorChangeHandler);
   }
 
   _dueDateToggleHandler(evt) {
@@ -225,10 +225,10 @@ export default class TaskEdit extends SmartView {
 
   static parseTaskToData(task) {
     return Object.assign({},
-      task, {
-        isDueDate: task.dueDate !== null,
-        isRepeating: isTaskRepeating(task.repeating)
-      }
+        task, {
+          isDueDate: task.dueDate !== null,
+          isRepeating: isTaskRepeating(task.repeating)
+        }
     );
   }
 
