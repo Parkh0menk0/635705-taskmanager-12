@@ -164,11 +164,11 @@ export default class TaskEdit extends SmartView {
 
     if (this._data.isDueDate) {
       this._datepicker = flatpickr(
-        this.getElement().querySelector(`.card__date`), {
-          dateFormat: `j F`,
-          defaultDate: this._data.dueDate,
-          onChange: this._dueDateChangeHandler
-        }
+          this.getElement().querySelector(`.card__date`), {
+            dateFormat: `j F`,
+            defaultDate: this._data.dueDate,
+            onChange: this._dueDateChangeHandler
+          }
       );
     }
   }
