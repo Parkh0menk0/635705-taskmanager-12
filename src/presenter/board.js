@@ -4,7 +4,6 @@ import TaskListView from "../view/task-list.js";
 import NoTaskView from "../view/no-task.js";
 import LoadMoreButtonView from "../view/load-more-button.js";
 import TaskPresenter from "./task.js";
-import {updateItem} from "../utils/common.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {sortTaskUp, sortTaskDown} from "../utils/task.js";
 import {SortType} from "../const.js";
@@ -25,15 +24,18 @@ export default class Board {
     this._noTaskComponent = new NoTaskView();
     this._loadMoreButtonComponent = new LoadMoreButtonView();
 
-    this._handleTaskChange = this._handleTaskChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._tasksModel.addObserver(this._handleModelEvent);
   }
 
   init() {
-    render(this._boardContainer, this._boardComponent);
-    render(this._boardComponent, this._taskListComponent);
+    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
+    render(this._boardComponent, this._taskListComponent, RenderPosition.BEFOREEND);
 
     this._renderBoard();
   }
@@ -55,8 +57,20 @@ export default class Board {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handleTaskChange(updatedTask) {
-    this._taskPresenter[updatedTask.id].init(updatedTask);
+  _handleViewAction(actionType, updateType, update) {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+  }
+
+  _handleModelEvent(updateType, data) {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
   }
 
   _handleSortTypeChange(sortType) {
@@ -75,7 +89,7 @@ export default class Board {
   }
 
   _renderTask(task) {
-    const taskPresenter = new TaskPresenter(this._taskListComponent, this._handleTaskChange, this._handleModeChange);
+    const taskPresenter = new TaskPresenter(this._taskListComponent, this._handleViewAction, this._handleModeChange);
     taskPresenter.init(task);
     this._taskPresenter[task.id] = taskPresenter;
   }
@@ -102,7 +116,8 @@ export default class Board {
   }
 
   _renderLoadMoreButton() {
-    render(this._boardComponent, this._loadMoreButtonComponent);
+    render(this._boardComponent, this._loadMoreButtonComponent, RenderPosition.BEFOREEND);
+
     this._loadMoreButtonComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
@@ -130,8 +145,8 @@ export default class Board {
       this._renderNoTasks();
       return;
     }
+
     this._renderSort();
     this._renderTaskList();
   }
-
 }
